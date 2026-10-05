@@ -1,0 +1,16 @@
+services:
+  base_datos:
+    image: mysql:8.0
+    container_name: mysql_clase
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_clase
+      MYSQL_DATABASE: control_estudios
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql/esquema_final.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+volumes:
+  mysql_data:
