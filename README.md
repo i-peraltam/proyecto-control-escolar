@@ -1,71 +1,103 @@
-# Sistema de Control Escolar - Proyecto Integrador de Bases de Datos
+# Sistema de Control Escolar
 
-Proyecto de escritorio en Java + Swing con MySQL 8.0 y Docker.
+Proyecto final de la asignatura Bases de Datos.
 
-## Incluye
-- CRUD completo de Estudiantes.
-- CRUD completo de Inscripciones (selecciona una fila para cargarla y poder actualizarla o eliminarla).
-- Tabla Cursos para relacionar las inscripciones.
-- Restriccion UNIQUE (id_estudiante, id_curso, periodo).
-- Consulta JOIN entre estudiantes, cursos e inscripciones.
-- DDL completo en `sql/esquema_final.sql`.
+La aplicación fue desarrollada en Java y permite administrar estudiantes e inscripciones utilizando una base de datos MySQL. Para facilitar la configuración del entorno se utiliza Docker, y la conexión entre Java y MySQL se realiza mediante JDBC.
+
+## Funcionalidades
+
+La aplicación permite:
+
+- Registrar, consultar, actualizar y eliminar estudiantes.
+- Registrar, consultar, actualizar y eliminar inscripciones.
+- Relacionar cada inscripción con un estudiante y un curso.
+- Consultar información de estudiantes, cursos e inscripciones mediante una consulta JOIN.
+- Evitar que un estudiante se inscriba dos veces al mismo curso en el mismo periodo.
+
+## Estructura del proyecto
+
+```text
+src/main/java/app/
+    ConexionDB.java
+    Main.java
+    VentanaPrincipal.java
+
+sql/
+    esquema_final.sql
+
+docker-compose.yml
+pom.xml
+README.md
+```
+
+El archivo `esquema_final.sql` contiene la creación de la base de datos y de las tablas `estudiantes`, `cursos` e `inscripciones`.
 
 ## Requisitos
+
+Para ejecutar el proyecto se necesita:
+
 - Docker Desktop
-- Java 17
-- Maven 3.9+ (opcional si se ejecuta desde un IDE)
+- Java 17 o superior
+- Maven, si se desea ejecutar el proyecto directamente con `mvn`
 
-## Ejecutar
+## Base de datos
 
-1. Desde la raiz del proyecto:
+La aplicación utiliza la base de datos:
+
+```text
+control_estudios
+```
+
+La configuración utilizada durante el desarrollo es:
+
+```text
+Host: localhost
+Puerto: 3307
+Usuario: root
+Contraseña: root_password_clase
+```
+
+## Ejecución
+
+Primero se debe levantar el servicio de MySQL desde la carpeta principal del proyecto:
 
 ```bash
 docker compose up -d
 ```
 
-2. Verificar:
+Para comprobar que el contenedor está activo:
 
 ```bash
 docker ps
 ```
 
-Debe aparecer el contenedor `mysql_clase` con el puerto `3307`.
+El contenedor debe aparecer con el nombre `mysql_clase` y el puerto `3307`.
 
-3. Ejecutar la aplicacion:
+Si Maven está instalado, la aplicación puede iniciarse con:
 
 ```bash
 mvn clean compile exec:java
 ```
 
-## Credenciales de desarrollo
-- Host: localhost
-- Puerto: 3307
-- Base: control_estudios
-- Usuario: root
-- Contrasena: root_password_clase
+También puede abrirse el proyecto desde un IDE de Java y ejecutarse desde la clase `Main`.
 
-## Consultas CRUD
+## Modelo de datos
 
-### Estudiantes
-```sql
-INSERT INTO estudiantes(matricula,nombre,apellido,correo) VALUES(?,?,?,?);
-SELECT id,matricula,nombre,apellido,correo FROM estudiantes ORDER BY id;
-UPDATE estudiantes SET matricula=?,nombre=?,apellido=?,correo=? WHERE id=?;
-DELETE FROM estudiantes WHERE id=?;
-```
+El sistema utiliza tres tablas principales:
 
-### Inscripciones
-```sql
-INSERT INTO inscripciones(id_estudiante,id_curso,periodo) VALUES(?,?,?);
-SELECT id_inscripcion,id_estudiante,id_curso,periodo FROM inscripciones ORDER BY id_inscripcion;
-UPDATE inscripciones SET id_estudiante=?,id_curso=?,periodo=? WHERE id_inscripcion=?;
-DELETE FROM inscripciones WHERE id_inscripcion=?;
-```
+- `estudiantes`: almacena los datos de los estudiantes.
+- `cursos`: contiene los cursos disponibles.
+- `inscripciones`: relaciona a los estudiantes con los cursos y registra el periodo.
 
-### Consulta JOIN
+La tabla `inscripciones` contiene llaves foráneas hacia `estudiantes` y `cursos`, además de una restricción para evitar inscripciones duplicadas del mismo estudiante en el mismo curso y periodo.
+
+## Consulta entre tablas
+
+La aplicación incluye una consulta que reúne información de las tres tablas para mostrar la matrícula y nombre del estudiante, el curso, los créditos y el periodo de inscripción.
+
 ```sql
 SELECT e.matricula,
-       CONCAT(e.nombre,' ',e.apellido) AS estudiante,
+       CONCAT(e.nombre, ' ', e.apellido) AS estudiante,
        c.nombre_curso,
        c.creditos,
        i.periodo
@@ -75,22 +107,8 @@ JOIN cursos c ON c.id_curso = i.id_curso
 ORDER BY i.id_inscripcion;
 ```
 
-## Evidencias que faltan generar en la computadora del equipo
-1. `docker compose up -d` y `docker ps`.
-2. Crear y actualizar estudiante.
-3. Crear y actualizar inscripcion.
-4. Mostrar consulta JOIN.
-5. Eliminar inscripcion y estudiante.
-6. Grabar video de demostracion.
+## Integrantes
 
-## GitHub
-Despues de probar el proyecto:
-
-```bash
-git init
-git add .
-git commit -m "Entrega final proyecto integrador"
-git branch -M main
-git remote add origin TU_URL_DEL_REPOSITORIO
-git push -u origin main
-```
+- José Antonio Castillo Moreno
+- Ignacio Antonio Peralta Muñoz
+- Saúl Francisco Vargas Espinoza
